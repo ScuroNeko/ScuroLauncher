@@ -124,27 +124,27 @@ partial class NewInstanceForm
         // 
         Honkai.FlatAppearance.BorderSize = 0;
         Honkai.FlatStyle = FlatStyle.Flat;
-        Honkai.Location = new Point(259, 322);
+        Honkai.Location = new Point(253, 322);
         Honkai.Name = "Honkai";
         Honkai.Size = new Size(117, 36);
         Honkai.TabIndex = 11;
         Honkai.Text = "Honkai";
         Honkai.UseVisualStyleBackColor = true;
-        Honkai.Click += Honkai_Click;
         Honkai.EnabledChanged += Button_EnabledChanged;
+        Honkai.Click += Honkai_Click;
         // 
         // Hsr
         // 
         Hsr.FlatAppearance.BorderSize = 0;
         Hsr.FlatStyle = FlatStyle.Flat;
-        Hsr.Location = new Point(142, 322);
+        Hsr.Location = new Point(124, 322);
         Hsr.Name = "Hsr";
-        Hsr.Size = new Size(105, 36);
+        Hsr.Size = new Size(123, 36);
         Hsr.TabIndex = 12;
         Hsr.Text = "HSR";
         Hsr.UseVisualStyleBackColor = true;
-        Hsr.Click += Hsr_Click;
         Hsr.EnabledChanged += Button_EnabledChanged;
+        Hsr.Click += Hsr_Click;
         // 
         // Genshin
         // 
@@ -156,8 +156,8 @@ partial class NewInstanceForm
         Genshin.TabIndex = 13;
         Genshin.Text = "Genshin";
         Genshin.UseVisualStyleBackColor = true;
-        Genshin.Click += Genshin_Click;
         Genshin.EnabledChanged += Button_EnabledChanged;
+        Genshin.Click += Genshin_Click;
         // 
         // CreateInstance
         // 

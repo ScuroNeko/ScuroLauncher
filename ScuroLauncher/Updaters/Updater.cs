@@ -2,6 +2,12 @@
 
 namespace ScuroLauncher.Updaters;
 
+public class UpdateInfo
+{
+    public bool HasUpdate { get; set; } = false;
+    public string NewVersion { get; set; } = "";
+}
+
 public class Updater
 {
     private static string hpatchz = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lib/hpatchz.exe");
@@ -9,7 +15,7 @@ public class Updater
     public static void Test()
     {
         var startInfo = new ProcessStartInfo {
-            FileName = Updater.hpatchz,
+            FileName = hpatchz,
             UseShellExecute = false,
             Arguments = "-info out.bin",
             RedirectStandardOutput = true,

@@ -7,12 +7,14 @@ namespace ScuroLauncher;
 public partial class NewInstanceForm : Form
 {
     private readonly MainForm _mainForm;
+    
     private readonly InstanceItem _newInstance;
     private readonly InstanceItem _importInstance;
     private InstanceType _instanceType;
+    private string _instanceDownloadUrl;
 
     private List<API.GameItem> _genshinList = [];
-    private List<API.GameItem> _hsrList = [];
+    private List<API.GameItem> _starRailList = [];
     private List<API.GameItem> _honkaiList = [];
 
     public NewInstanceForm(MainForm mainForm)
@@ -22,16 +24,18 @@ public partial class NewInstanceForm : Form
         _importInstance = new InstanceItem();
 
         InitializeComponent();
-        LoadTheme(mainForm.SelectedTheme);
+        LoadTheme(Providers.SelectedTheme);
     }
 
     private void BuildVersionList()
     {
         var versions = _instanceType switch
         {
-            InstanceType.Hsr => _hsrList,
+            InstanceType.StarRail => _starRailList,
             InstanceType.Honkai => _honkaiList,
-            _ => _genshinList,
+            InstanceType.Genshin => _genshinList,
+            InstanceType.Zzz => [],
+            _ => []
         };
         VersionSelector.Items.Clear();
         versions.ForEach(v =>
@@ -47,19 +51,23 @@ public partial class NewInstanceForm : Form
         if (selectedItem == null) return;
         var versions = _instanceType switch
         {
-            InstanceType.Hsr => _hsrList,
+            InstanceType.StarRail => _starRailList,
             InstanceType.Honkai => _honkaiList,
-            _ => _genshinList,
+            InstanceType.Genshin => _genshinList,
+            InstanceType.Zzz => [],
+            _ => []
         };
-        // _version = versions.Where(v => v.name == selectedItem.ToString()).First();
-        _newInstance.Version = selectedItem.ToString();
+        var version = versions.Find(v => v.name == selectedItem.ToString()) ?? throw new NullReferenceException();
+        var link = version.links.Find(link => link.name.StartsWith("Client")) ?? throw new NullReferenceException();
+        _instanceDownloadUrl = link.url;
+        _newInstance.Version = selectedItem.ToString() ?? throw new NullReferenceException();
     }
 
     private void Button_EnabledChanged(object sender, EventArgs e)
     {
         if (sender is not Button buttonSender) return;
-        buttonSender.BackColor = buttonSender.Enabled ? ColorTranslator.FromHtml(_mainForm.SelectedTheme.SurfaceColor) : ColorTranslator.FromHtml(_mainForm.SelectedTheme.OverlayColor);
-        buttonSender.ForeColor = ColorTranslator.FromHtml(_mainForm.SelectedTheme.TextColor);
+        buttonSender.BackColor = buttonSender.Enabled ? Providers.SelectedTheme.SurfaceColor : Providers.SelectedTheme.OverlayColor;
+        buttonSender.ForeColor = Providers.SelectedTheme.TextColor;
     }
 
     private async void Genshin_Click(object sender, EventArgs e)
@@ -79,18 +87,21 @@ public partial class NewInstanceForm : Form
         Genshin.Enabled = true;
         Hsr.Enabled = false;
         Honkai.Enabled = true;
-        _instanceType = InstanceType.Hsr;
-        if (_hsrList.Count == 0)
-            _hsrList = await API.MurasakiAPI.GetHsrVersions();
+        _instanceType = InstanceType.StarRail;
+        if (_starRailList.Count == 0)
+            _starRailList = await API.MurasakiAPI.GetStarRailVersions();
         BuildVersionList();
     }
 
-    private void Honkai_Click(object sender, EventArgs e)
+    private async void Honkai_Click(object sender, EventArgs e)
     {
         Genshin.Enabled = true;
         Hsr.Enabled = true;
         Honkai.Enabled = false;
         _instanceType = InstanceType.Honkai;
+        if(_honkaiList.Count == 0)
+            _honkaiList = await API.MurasakiAPI.GetHonkaiImpactVersions();
+        BuildVersionList();
     }
     private void ReleasesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
@@ -127,9 +138,10 @@ public partial class NewInstanceForm : Form
     private void CreateInstance_Click(object sender, EventArgs e)
     {
         _newInstance.Type = _instanceType;
-        _mainForm.Instances.AddInstance(_newInstance);
-        _mainForm.Instances.Save();
+        Providers.Instances.AddInstance(_newInstance);
+        Providers.Instances.Save();
         _mainForm.LoadInstances();
+        Providers.DownloadsForm.AddDownloadTask(_instanceDownloadUrl);
         Close();
     }
 
@@ -158,57 +170,59 @@ public partial class NewInstanceForm : Form
     private void ImportInstance_Click(object sender, EventArgs e)
     {
         if (File.Exists(Path.Combine(_importInstance.Path, "GenshinImpact.exe"))) _importInstance.Type = InstanceType.Genshin;
-        if (File.Exists(Path.Combine(_importInstance.Path, "StarRail.exe"))) _importInstance.Type = InstanceType.Hsr;
+        if (File.Exists(Path.Combine(_importInstance.Path, "StarRail.exe"))) _importInstance.Type = InstanceType.StarRail;
         var iniFile = new IniFile(Path.Combine(_importInstance.Path, "config.ini"));
-        _importInstance.Version = $@"Release {iniFile.Read("game_version", "General")}";
-        _mainForm.Instances.AddInstance(_importInstance);
-        _mainForm.Instances.Save();
+        var version = iniFile.Read("game_version", "General");
+        var channel = iniFile.Read("cps", "General") == "beta" ? "Beta" : "Release";
+        _importInstance.Version = $@"{channel} {version}";
+        Providers.Instances.AddInstance(_importInstance);
+        Providers.Instances.Save();
         _mainForm.LoadInstances();
         Close();
     }
 
     private void LoadTheme(ThemeItem selectedTheme)
     {
-        BackColor = ColorTranslator.FromHtml(selectedTheme.BackgroundColor);
-        TabPage1.BackColor = ColorTranslator.FromHtml(selectedTheme.BackgroundColor);
-        TabPage2.BackColor = ColorTranslator.FromHtml(selectedTheme.BackgroundColor);
+        BackColor = selectedTheme.BackgroundColor;
+        TabPage1.BackColor = selectedTheme.BackgroundColor;
+        TabPage2.BackColor = selectedTheme.BackgroundColor;
 
         // Create instance
-        VersionSelector.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        VersionSelector.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        VersionSelector.BackColor = selectedTheme.SurfaceColor;
+        VersionSelector.ForeColor = selectedTheme.TextColor;
 
-        InstanceName.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        InstanceName.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        InstanceName.BackColor = selectedTheme.SurfaceColor;
+        InstanceName.ForeColor = selectedTheme.TextColor;
 
-        InstancePath.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        InstancePath.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        InstancePath.BackColor = selectedTheme.SurfaceColor;
+        InstancePath.ForeColor = selectedTheme.TextColor;
 
-        Genshin.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        Genshin.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
-        Hsr.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        Hsr.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
-        Honkai.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        Honkai.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        Genshin.BackColor = selectedTheme.SurfaceColor;
+        Genshin.ForeColor = selectedTheme.TextColor;
+        Hsr.BackColor = selectedTheme.SurfaceColor;
+        Hsr.ForeColor = selectedTheme.TextColor;
+        Honkai.BackColor = selectedTheme.SurfaceColor;
+        Honkai.ForeColor = selectedTheme.TextColor;
 
-        ChooseFolder.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        ChooseFolder.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        ChooseFolder.BackColor = selectedTheme.SurfaceColor;
+        ChooseFolder.ForeColor = selectedTheme.TextColor;
 
-        CreateInstance.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        CreateInstance.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        CreateInstance.BackColor = selectedTheme.SurfaceColor;
+        CreateInstance.ForeColor = selectedTheme.TextColor;
 
-        ReleasesCheckBox.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
-        BetaCheckBox.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        ReleasesCheckBox.ForeColor = selectedTheme.TextColor;
+        BetaCheckBox.ForeColor = selectedTheme.TextColor;
         
         // Import instance
-        ImportInstanceName.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        ImportInstanceName.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        ImportInstanceName.BackColor = selectedTheme.SurfaceColor;
+        ImportInstanceName.ForeColor = selectedTheme.TextColor;
         
-        ImportInstancePath.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        ImportInstancePath.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        ImportInstancePath.BackColor = selectedTheme.SurfaceColor;
+        ImportInstancePath.ForeColor = selectedTheme.TextColor;
         
-        ImportChooseFolder.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        ImportChooseFolder.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
-        ImportInstance.BackColor = ColorTranslator.FromHtml(selectedTheme.SurfaceColor);
-        ImportInstance.ForeColor = ColorTranslator.FromHtml(selectedTheme.TextColor);
+        ImportChooseFolder.BackColor = selectedTheme.SurfaceColor;
+        ImportChooseFolder.ForeColor = selectedTheme.TextColor;
+        ImportInstance.BackColor = selectedTheme.SurfaceColor;
+        ImportInstance.ForeColor = selectedTheme.TextColor;
     }
 }

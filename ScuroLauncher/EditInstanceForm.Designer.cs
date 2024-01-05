@@ -28,115 +28,106 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SplitContainer = new SplitContainer();
-            Main = new Button();
-            MainSettings = new Panel();
             InstanceName = new TextBox();
-            Save = new Button();
             InstanceImage = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)SplitContainer).BeginInit();
-            SplitContainer.Panel1.SuspendLayout();
-            SplitContainer.Panel2.SuspendLayout();
-            SplitContainer.SuspendLayout();
-            MainSettings.SuspendLayout();
+            UseProxy = new CheckBox();
+            ProxyUrl = new TextBox();
+            Save = new Button();
+            InstancePath = new TextBox();
             ((System.ComponentModel.ISupportInitialize)InstanceImage).BeginInit();
             SuspendLayout();
             // 
-            // SplitContainer
-            // 
-            SplitContainer.Dock = DockStyle.Fill;
-            SplitContainer.FixedPanel = FixedPanel.Panel1;
-            SplitContainer.Location = new Point(0, 0);
-            SplitContainer.Name = "SplitContainer";
-            // 
-            // SplitContainer.Panel1
-            // 
-            SplitContainer.Panel1.Controls.Add(Main);
-            // 
-            // SplitContainer.Panel2
-            // 
-            SplitContainer.Panel2.Controls.Add(MainSettings);
-            SplitContainer.Size = new Size(648, 450);
-            SplitContainer.SplitterDistance = 191;
-            SplitContainer.SplitterWidth = 2;
-            SplitContainer.TabIndex = 0;
-            // 
-            // Main
-            // 
-            Main.FlatAppearance.BorderSize = 0;
-            Main.FlatStyle = FlatStyle.Flat;
-            Main.Font = new Font("Segoe UI Semilight", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            Main.Location = new Point(0, 0);
-            Main.Name = "Main";
-            Main.Size = new Size(192, 30);
-            Main.TabIndex = 0;
-            Main.Text = "Main";
-            Main.TextAlign = ContentAlignment.MiddleLeft;
-            Main.UseVisualStyleBackColor = true;
-            // 
-            // MainSettings
-            // 
-            MainSettings.Controls.Add(InstanceName);
-            MainSettings.Controls.Add(Save);
-            MainSettings.Controls.Add(InstanceImage);
-            MainSettings.Dock = DockStyle.Fill;
-            MainSettings.Location = new Point(0, 0);
-            MainSettings.Name = "MainSettings";
-            MainSettings.Size = new Size(455, 450);
-            MainSettings.TabIndex = 0;
-            // 
             // InstanceName
             // 
-            InstanceName.Location = new Point(12, 146);
+            InstanceName.BackColor = SystemColors.Window;
+            InstanceName.BorderStyle = BorderStyle.None;
+            InstanceName.Location = new Point(146, 12);
             InstanceName.Name = "InstanceName";
-            InstanceName.Size = new Size(128, 23);
-            InstanceName.TabIndex = 2;
-            InstanceName.TextChanged += InstanceName_TextChanged;
-            // 
-            // Save
-            // 
-            Save.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            Save.Location = new Point(368, 415);
-            Save.Name = "Save";
-            Save.Size = new Size(75, 23);
-            Save.TabIndex = 1;
-            Save.Text = "Save";
-            Save.UseVisualStyleBackColor = true;
-            Save.Click += Save_Click;
+            InstanceName.PlaceholderText = "Instance Name";
+            InstanceName.Size = new Size(208, 16);
+            InstanceName.TabIndex = 5;
             // 
             // InstanceImage
             // 
             InstanceImage.Location = new Point(12, 12);
             InstanceImage.Name = "InstanceImage";
             InstanceImage.Size = new Size(128, 128);
-            InstanceImage.TabIndex = 0;
+            InstanceImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            InstanceImage.TabIndex = 3;
             InstanceImage.TabStop = false;
+            InstanceImage.Click += InstanceImage_Click;
+            // 
+            // UseProxy
+            // 
+            UseProxy.AutoSize = true;
+            UseProxy.Location = new Point(146, 56);
+            UseProxy.Name = "UseProxy";
+            UseProxy.Size = new Size(88, 22);
+            UseProxy.TabIndex = 6;
+            UseProxy.Text = "Use Proxy?";
+            UseProxy.UseVisualStyleBackColor = true;
+            UseProxy.CheckedChanged += UseProxy_CheckedChanged;
+            // 
+            // ProxyUrl
+            // 
+            ProxyUrl.BorderStyle = BorderStyle.None;
+            ProxyUrl.Location = new Point(146, 84);
+            ProxyUrl.Name = "ProxyUrl";
+            ProxyUrl.PlaceholderText = "Proxy URL";
+            ProxyUrl.Size = new Size(208, 16);
+            ProxyUrl.TabIndex = 7;
+            ProxyUrl.TextChanged += ProxyUrl_TextChanged;
+            // 
+            // Save
+            // 
+            Save.BackColor = SystemColors.Control;
+            Save.FlatAppearance.BorderSize = 0;
+            Save.FlatStyle = FlatStyle.Flat;
+            Save.Location = new Point(279, 117);
+            Save.Name = "Save";
+            Save.Size = new Size(75, 23);
+            Save.TabIndex = 8;
+            Save.Text = "Save";
+            Save.UseVisualStyleBackColor = false;
+            Save.Click += Save_Click;
+            // 
+            // InstancePath
+            // 
+            InstancePath.BackColor = SystemColors.Window;
+            InstancePath.BorderStyle = BorderStyle.None;
+            InstancePath.Location = new Point(146, 34);
+            InstancePath.Name = "InstancePath";
+            InstancePath.PlaceholderText = "Instance Path";
+            InstancePath.Size = new Size(208, 16);
+            InstancePath.TabIndex = 5;
+            InstancePath.TextChanged += InstancePath_TextChanged;
             // 
             // EditInstanceForm
             // 
             AutoScaleDimensions = new SizeF(7F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(648, 450);
-            Controls.Add(SplitContainer);
+            ClientSize = new Size(366, 151);
+            Controls.Add(Save);
+            Controls.Add(ProxyUrl);
+            Controls.Add(UseProxy);
+            Controls.Add(InstancePath);
+            Controls.Add(InstanceName);
+            Controls.Add(InstanceImage);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "EditInstanceForm";
-            Text = "EditInstanceForm";
-            SplitContainer.Panel1.ResumeLayout(false);
-            SplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)SplitContainer).EndInit();
-            SplitContainer.ResumeLayout(false);
-            MainSettings.ResumeLayout(false);
-            MainSettings.PerformLayout();
+            Text = "Edit Instance";
             ((System.ComponentModel.ISupportInitialize)InstanceImage).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
-        private SplitContainer SplitContainer;
-        private Button Main;
-        private Panel MainSettings;
-        private PictureBox InstanceImage;
-        private Button Save;
         private TextBox InstanceName;
+        private PictureBox InstanceImage;
+        private CheckBox UseProxy;
+        private TextBox ProxyUrl;
+        private Button Save;
+        private TextBox InstancePath;
     }
 }

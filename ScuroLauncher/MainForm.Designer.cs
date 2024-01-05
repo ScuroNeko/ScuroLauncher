@@ -19,6 +19,8 @@ partial class MainForm
     {
         Panel = new Panel();
         SplitContainer = new SplitContainer();
+        Kill = new Button();
+        DeleteInstance = new Button();
         CheckUpdates = new Button();
         EditInstance = new Button();
         LaunchInstance = new Button();
@@ -32,7 +34,7 @@ partial class MainForm
         EditCategoryMenuItem = new ToolStripMenuItem();
         SettingsToolMenuItem = new ToolStripMenuItem();
         downloadsManagerToolStripMenuItem = new ToolStripMenuItem();
-        DeleteInstance = new Button();
+        aboutMenuItem = new ToolStripMenuItem();
         Panel.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)SplitContainer).BeginInit();
         SplitContainer.Panel1.SuspendLayout();
@@ -62,6 +64,7 @@ partial class MainForm
         // 
         // SplitContainer.Panel1
         // 
+        SplitContainer.Panel1.Controls.Add(Kill);
         SplitContainer.Panel1.Controls.Add(DeleteInstance);
         SplitContainer.Panel1.Controls.Add(CheckUpdates);
         SplitContainer.Panel1.Controls.Add(EditInstance);
@@ -78,6 +81,20 @@ partial class MainForm
         SplitContainer.SplitterDistance = 152;
         SplitContainer.SplitterWidth = 1;
         SplitContainer.TabIndex = 1;
+        // 
+        // Kill
+        // 
+        Kill.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        Kill.FlatAppearance.BorderSize = 0;
+        Kill.FlatStyle = FlatStyle.Flat;
+        Kill.Location = new Point(12, 185);
+        Kill.Name = "Kill";
+        Kill.Size = new Size(128, 23);
+        Kill.TabIndex = 6;
+        Kill.Text = "Kill";
+        Kill.UseVisualStyleBackColor = true;
+        Kill.Visible = false;
+        Kill.Click += Kill_Click;
         // 
         // DeleteInstance
         // 
@@ -191,7 +208,7 @@ partial class MainForm
         InstanceList.Location = new Point(3, 0);
         InstanceList.MultiSelect = false;
         InstanceList.Name = "InstanceList";
-        InstanceList.Size = new Size(491, 391);
+        InstanceList.Size = new Size(476, 391);
         InstanceList.TabIndex = 0;
         InstanceList.UseCompatibleStateImageBehavior = false;
         InstanceList.SelectedIndexChanged += InstanceList_SelectedIndexChanged;
@@ -199,7 +216,7 @@ partial class MainForm
         // 
         // MainMenu
         // 
-        MainMenu.Items.AddRange(new ToolStripItem[] { FileCategoryMenuItem, EditCategoryMenuItem, downloadsManagerToolStripMenuItem });
+        MainMenu.Items.AddRange(new ToolStripItem[] { FileCategoryMenuItem, EditCategoryMenuItem, downloadsManagerToolStripMenuItem, aboutMenuItem });
         MainMenu.Location = new Point(0, 0);
         MainMenu.Name = "MainMenu";
         MainMenu.Size = new Size(623, 26);
@@ -231,7 +248,14 @@ partial class MainForm
         downloadsManagerToolStripMenuItem.Name = "downloadsManagerToolStripMenuItem";
         downloadsManagerToolStripMenuItem.Size = new Size(136, 22);
         downloadsManagerToolStripMenuItem.Text = "Downloads manager";
-        downloadsManagerToolStripMenuItem.Click += downloadsManagerToolStripMenuItem_Click;
+        downloadsManagerToolStripMenuItem.Click += DownloadsManagerToolStripMenuItem_Click;
+        // 
+        // aboutMenuItem
+        // 
+        aboutMenuItem.Name = "aboutMenuItem";
+        aboutMenuItem.Size = new Size(53, 22);
+        aboutMenuItem.Text = "About";
+        aboutMenuItem.Click += AboutMenuItem_Click;
         // 
         // MainForm
         // 
@@ -274,4 +298,6 @@ partial class MainForm
     private Label InstanceVersion;
     private ToolStripMenuItem downloadsManagerToolStripMenuItem;
     private Button DeleteInstance;
+    private Button Kill;
+    private ToolStripMenuItem aboutMenuItem;
 }

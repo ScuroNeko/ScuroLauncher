@@ -4,7 +4,7 @@ namespace ScuroLauncher;
 
 public partial class SettingsForm : Form
 {
-    private string _selectedTheme;
+    private string _selectedTheme = "";
     private readonly MainForm _mainForm;
 
     public SettingsForm(MainForm mainForm)
@@ -12,12 +12,12 @@ public partial class SettingsForm : Form
         InitializeComponent();
 
         _mainForm = mainForm;
-        ThemeComboBox.Text = mainForm.Config.Theme;
-        mainForm.Themes.Themes.ForEach(theme =>
+        ThemeComboBox.Text = Providers.Config.Theme;
+        Providers.Themes.Themes.ForEach(theme =>
         {
             ThemeComboBox.Items.Add(theme.Name);
         });
-        LoadTheme(mainForm.SelectedTheme);
+        LoadTheme(Providers.SelectedTheme);
     }
 
     private void ThemeComboBoxSelectedIndexChanged(object sender, EventArgs e)
@@ -27,22 +27,22 @@ public partial class SettingsForm : Form
     private void Save_Click(object sender, EventArgs e)
     {
         _selectedTheme = ThemeComboBox.SelectedItem?.ToString() ?? SettingsDefaults.DefaultThemeName;
-        var selectedThemeItem = _mainForm.Themes.Themes.Find(x => x.Name == _selectedTheme) ?? SettingsDefaults.DefaultTheme;
-        _mainForm.Config.Theme = selectedThemeItem.Name;
-        _mainForm.Config.Save();
-        _mainForm.SelectedTheme = selectedThemeItem;
+        var selectedThemeItem = Providers.Themes.Themes.Find(x => x.Name == _selectedTheme) ?? SettingsDefaults.DefaultTheme;
+        Providers.Config.Theme = selectedThemeItem.Name;
+        Providers.Config.Save();
+        Providers.SelectedTheme = selectedThemeItem;
         _mainForm.LoadTheme(selectedThemeItem);
         LoadTheme(selectedThemeItem);
     }
 
     private void LoadTheme(ThemeItem theme)
     {
-        BackColor = ColorTranslator.FromHtml(theme.BackgroundColor);
+        BackColor = theme.BackgroundColor;
         
-        ThemeComboBox.BackColor = ColorTranslator.FromHtml(theme.SurfaceColor);
-        ThemeComboBox.ForeColor = ColorTranslator.FromHtml(theme.TextColor);
+        ThemeComboBox.BackColor = theme.SurfaceColor;
+        ThemeComboBox.ForeColor = theme.TextColor;
         
-        Save.BackColor = ColorTranslator.FromHtml(theme.SurfaceColor);
-        Save.ForeColor = ColorTranslator.FromHtml(theme.TextColor);
+        Save.BackColor = theme.SurfaceColor;
+        Save.ForeColor = theme.TextColor;
     }
 }

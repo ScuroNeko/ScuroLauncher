@@ -1,7 +1,9 @@
 ﻿using ScuroLauncher.Settings;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,13 +15,35 @@ internal static class Utils
     {
         if(File.Exists(instance.Icon)) return Image.FromFile(instance.Icon);
 
-        return (InstanceType)instance.Type switch
+        return instance.Type switch
         {
             InstanceType.Genshin => Properties.Resources.default_genshin_icon,
-            InstanceType.Hsr => Properties.Resources.default_hsr_icon,
+            InstanceType.StarRail => Properties.Resources.default_hsr_icon,
             InstanceType.Honkai => Properties.Resources.default_honkai_icon,
+            InstanceType.Zzz => Properties.Resources.default_zzz_icon,
             _ => null
         };
+    }
+
+    public static void OpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(url);
+        }
+        catch
+        {
+            // hack because of this: https://github.com/dotnet/corefx/issues/10361
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                url = url.Replace("&", "^&");
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            else
+            {
+                throw;
+            }
+        }
     }
 
     private static readonly string[] SizeSuffixes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
@@ -53,15 +77,5 @@ internal static class Utils
         return string.Format("{0:n" + decimalPlaces + "} {1}", 
             adjustedSize, 
             SizeSuffixes[mag]);
-    }
-    
-    // Todo FIXME
-    public static void UpdateInstance(InstanceItem instance)
-    {
-        var instances = Instance.Load();
-        var storedInstance = instances.Instances.Find(x => x.Name == instance.Name);
-        instances.Instances.Remove(storedInstance);
-        instances.AddInstance(instance);
-        instances.Save();
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ScuroLauncher.Settings;
+﻿namespace ScuroLauncher.Settings;
 
 public class SettingsDefaults
 {
@@ -13,21 +7,21 @@ public class SettingsDefaults
     {
         Name = "Catppuccin Latte",
         Font = "Segoe UI",
-        BackgroundColor = "#eff1f5",
-        SurfaceColor = "#ccd0da",
-        OverlayColor = "#9ca0b0",
-        TextColor = "#4c4f69",
-        AccentColor = "#8839ef"
+        BackgroundColor = ColorTranslator.FromHtml("#eff1f5"),
+        SurfaceColor = ColorTranslator.FromHtml("#ccd0da"),
+        OverlayColor = ColorTranslator.FromHtml("#9ca0b0"),
+        TextColor = ColorTranslator.FromHtml("#4c4f69"),
+        AccentColor = ColorTranslator.FromHtml("#8839ef")
     };
     public static readonly ThemeItem CatppuccinMocha = new()
     {
         Name = "Catppuccin Mocha",
         Font = "Segoe UI",
-        BackgroundColor = "#1e1e2e",
-        SurfaceColor = "#313244",
-        OverlayColor = "#6c7086",
-        TextColor = "#cdd6f4",
-        AccentColor = "#cba6f7"
+        BackgroundColor = ColorTranslator.FromHtml("#1e1e2e"),
+        SurfaceColor = ColorTranslator.FromHtml("#313244"),
+        OverlayColor = ColorTranslator.FromHtml("#6c7086"),
+        TextColor = ColorTranslator.FromHtml("#cdd6f4"),
+        AccentColor = ColorTranslator.FromHtml("#cba6f7")
     };
     public static ThemeItem DefaultTheme = CatppuccinLatte;
     public static string DefaultThemeName = CatppuccinLatte.Name;

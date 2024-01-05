@@ -1,15 +1,11 @@
-﻿using System.ComponentModel;
-using System.Text.Json;
+﻿using Newtonsoft.Json;
 
 namespace ScuroLauncher.Settings;
 
 public class Config
 {
     public string Theme { get; set; } = SettingsDefaults.DefaultThemeName;
-    public uint NextID { get; set; } = 1;
     public bool Debug { get; set; } = false;
-    
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public static bool IsExist()
     {
@@ -19,7 +15,7 @@ public class Config
     public static Config New()
     {
         var config = new Config();
-        var jsonString = JsonSerializer.Serialize(config, JsonOptions);
+        var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
         
         Directory.CreateDirectory(SettingsLocations.ConfigFolder);
         File.WriteAllText(SettingsLocations.ConfigPath, jsonString);
@@ -30,12 +26,12 @@ public class Config
     public static Config Load()
     {
         var jsonString = File.ReadAllText(SettingsLocations.ConfigPath);
-        return JsonSerializer.Deserialize<Config>(jsonString) ?? throw new Exception("Can't deserialize json config");
+        return JsonConvert.DeserializeObject<Config>(jsonString) ?? throw new JsonException("Can't deserialize json config");
     }
 
     public void Save()
     {
-        var jsonString = JsonSerializer.Serialize(this, JsonOptions);
+        var jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
         File.WriteAllText(SettingsLocations.ConfigPath, jsonString);
         Console.WriteLine(jsonString);
     }

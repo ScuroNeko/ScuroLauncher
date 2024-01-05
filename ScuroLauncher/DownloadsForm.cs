@@ -1,4 +1,6 @@
-﻿namespace ScuroLauncher;
+﻿using System.IO.Compression;
+
+namespace ScuroLauncher;
 
 public enum DownloadTaskType: byte
 {
@@ -20,16 +22,14 @@ public record DownloadTask
 public partial class DownloadsForm : Form
 {
     private int _taskY = 12;
-    private const int _taskYStep = 72;
+    private const int TaskYStep = 72;
     private readonly List<DownloadTask> _tasks = [];
     private DownloadTask? _currentTask;
-    private readonly MainForm _mainForm;
     private bool _isRunning = true;
 
-    public DownloadsForm(MainForm mainForm)
+    public DownloadsForm()
     {
         InitializeComponent();
-        _mainForm = mainForm;
 
         LoadTheme();
         Draw();
@@ -91,6 +91,15 @@ public partial class DownloadsForm : Form
         var task = new DownloadTask { Name = name, TaskType = DownloadTaskType.UNZIP };
         _tasks.Add(task);
         DrawTask(task);
+
+        using var file = File.OpenRead(name);
+        using var zip = new ZipArchive(file, ZipArchiveMode.Read);
+        
+        // TODO Count all entries and total unzipped for progress
+        zip.Entries.ToList().ForEach(entry =>
+        {
+            entry.Open();
+        });
     }
 
     public void AddHdiffTask(string name)
@@ -111,7 +120,7 @@ public partial class DownloadsForm : Form
             Name = task.Name,
             Size = new Size(Panel.Width-24, 60),
             Location = new Point(12, _taskY),
-            BackColor = ColorTranslator.FromHtml(_mainForm.SelectedTheme.SurfaceColor),
+            BackColor = Providers.SelectedTheme.SurfaceColor,
         };
         var taskTitle = new Label
         {
@@ -119,13 +128,13 @@ public partial class DownloadsForm : Form
             Text = $@"{task.TaskType} {task.Name}",
             Location = new Point(12, 12),
             AutoSize = true,
-            ForeColor = ColorTranslator.FromHtml(_mainForm.SelectedTheme.TextColor),
+            ForeColor = Providers.SelectedTheme.TextColor,
         };
         var taskProgress = new Label
         {
             Text = @"",
             Location = new Point(taskTitle.Width + 24, 12),
-            ForeColor = ColorTranslator.FromHtml(_mainForm.SelectedTheme.TextColor),
+            ForeColor = Providers.SelectedTheme.TextColor,
         };
         var taskProgressBar = new ProgressBar { 
             Location = new Point(12, 36),
@@ -147,7 +156,7 @@ public partial class DownloadsForm : Form
         
         Console.WriteLine($@"New {task.TaskType} {task} was register");
 
-        _taskY += _taskYStep;
+        _taskY += TaskYStep;
     }
 
     private void UpdateProgress(long progress, long total)
@@ -171,8 +180,8 @@ public partial class DownloadsForm : Form
 
     private void LoadTheme()
     {
-        var selectedTheme = _mainForm.SelectedTheme;
-        Panel.BackColor = ColorTranslator.FromHtml(selectedTheme.BackgroundColor);
+        var selectedTheme = Providers.SelectedTheme;
+        Panel.BackColor = selectedTheme.BackgroundColor;
     }
 
     private void OnClose(object sender, FormClosingEventArgs e)

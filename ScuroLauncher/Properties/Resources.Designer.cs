@@ -93,6 +93,16 @@ namespace ScuroLauncher.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap default_zzz_icon {
+            get {
+                object obj = ResourceManager.GetObject("default_zzz_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap genshin43 {
             get {
                 object obj = ResourceManager.GetObject("genshin43", resourceCulture);
