@@ -28,6 +28,7 @@ public class ProxyService
 
         _server.AddEndPoint(_endPoint);
         _server.Start();
+        Providers.Logger.Info("ProxyService loaded and ready to work");
     }
 
     ~ProxyService()
@@ -43,15 +44,14 @@ public class ProxyService
     {
         _server.SetAsSystemHttpProxy(_endPoint);
         _server.SetAsSystemHttpsProxy(_endPoint);
-        Console.WriteLine("ProxyService was started");
-        
+        Providers.Logger.Info("ProxyService was started");
     }
 
     public void Stop()
     {
         _server.DisableSystemHttpProxy();
         _server.DisableSystemHttpsProxy();
-        Console.WriteLine("ProxyService was stopped");
+        Providers.Logger.Info("ProxyService was stopped");
     }
 
     private Task BeforeTunnelConnectRequest(object sender, TunnelConnectSessionEventArgs args)
@@ -86,7 +86,7 @@ public class ProxyService
         replacedUrl = replacedUrl.Replace("hk4e_cn", "hk4e_global"); // cn -> global for CN builds
         args.HttpClient.Request.Url = replacedUrl;
 
-        Console.WriteLine($"Redirecting: {replacedUrl}");
+        Providers.Logger.Info($"Redirecting: {replacedUrl}");
 
         return Task.CompletedTask;
     }

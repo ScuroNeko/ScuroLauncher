@@ -3,7 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScuroLauncher", "ScuroLauncher/ScuroLauncher.csproj", "{9C67B2F4-0593-4CC0-A76D-9F2BEF288365}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScuroLauncher", "ScuroLauncher\ScuroLauncher.csproj", "{9C67B2F4-0593-4CC0-A76D-9F2BEF288365}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5B4BB2C0-7C10-49F6-B1A5-8E47BE85E931} = {5B4BB2C0-7C10-49F6-B1A5-8E47BE85E931}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScuroLogger", "ScuroLogger\ScuroLogger.csproj", "{A5FD9E02-73B2-42BC-BC17-ECECF223F481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSAPatch", "RSAPatch\RSAPatch.csproj", "{EAE54A43-7729-4F46-91B0-70BDE70C829F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScuroUpdater", "ScuroUpdater\ScuroUpdater.csproj", "{B4528B75-ADB6-454C-93A6-1510C90E67AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScuroLib", "ScuroLib\ScuroLib.csproj", "{B622D8B7-3A73-4BDD-BE59-571676779F79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScuroHttp", "ScuroHttp\ScuroHttp.csproj", "{607EDFDA-9853-4754-8495-C186A8D4EFC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +28,26 @@ Global
 		{9C67B2F4-0593-4CC0-A76D-9F2BEF288365}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C67B2F4-0593-4CC0-A76D-9F2BEF288365}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C67B2F4-0593-4CC0-A76D-9F2BEF288365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5FD9E02-73B2-42BC-BC17-ECECF223F481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5FD9E02-73B2-42BC-BC17-ECECF223F481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5FD9E02-73B2-42BC-BC17-ECECF223F481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5FD9E02-73B2-42BC-BC17-ECECF223F481}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAE54A43-7729-4F46-91B0-70BDE70C829F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAE54A43-7729-4F46-91B0-70BDE70C829F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAE54A43-7729-4F46-91B0-70BDE70C829F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAE54A43-7729-4F46-91B0-70BDE70C829F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4528B75-ADB6-454C-93A6-1510C90E67AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4528B75-ADB6-454C-93A6-1510C90E67AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4528B75-ADB6-454C-93A6-1510C90E67AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4528B75-ADB6-454C-93A6-1510C90E67AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B622D8B7-3A73-4BDD-BE59-571676779F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B622D8B7-3A73-4BDD-BE59-571676779F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B622D8B7-3A73-4BDD-BE59-571676779F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B622D8B7-3A73-4BDD-BE59-571676779F79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{607EDFDA-9853-4754-8495-C186A8D4EFC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{607EDFDA-9853-4754-8495-C186A8D4EFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{607EDFDA-9853-4754-8495-C186A8D4EFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{607EDFDA-9853-4754-8495-C186A8D4EFC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,4 @@
-﻿using ScuroLauncher.Settings;
-
-namespace ScuroLauncher.RSAPatch;
+﻿namespace RSAPatch;
 
 public enum GameVersionBranch: byte
 {
@@ -24,8 +22,12 @@ public record GameVersion
         var v = version.Split(' ');
         if (v.Length == 2)
         {
-            if (v[0] == "Release") gameVersionBranch = GameVersionBranch.Release;
-            else if (v[0] == "Beta") gameVersionBranch = GameVersionBranch.Beta;
+            gameVersionBranch = v[0] switch
+            {
+                "Release" => GameVersionBranch.Release,
+                "Beta" => GameVersionBranch.Beta,
+                _ => gameVersionBranch
+            };
         }
 
         v = v[^1].Split('.');
@@ -35,7 +37,8 @@ public record GameVersion
             gameVersionBranch = v[2].StartsWith('5') ? GameVersionBranch.Beta : GameVersionBranch.Release;
         
 
-        return new() { 
+        return new GameVersion
+        { 
             Major = int.Parse(v[0]), Minor = int.Parse(v[1]), 
             Patch = int.Parse(v.Length == 3 ? v[2]: "0"),
             Branch = gameVersionBranch
@@ -46,23 +49,23 @@ public record GameVersion
     public static bool operator>(GameVersion version1, GameVersion version2)
     {
         if(version1.Major == version2.Major) return version1.Minor > version2.Minor;
-        else return version1.Major > version2.Major;
+        return version1.Major > version2.Major;
     }
     public static bool operator<(GameVersion version1, GameVersion version2)
     {
         if (version1.Major == version2.Major) return version1.Minor < version2.Minor;
-        else return version1.Major < version2.Major;
+        return version1.Major < version2.Major;
     }
 
     public static bool operator>=(GameVersion version1, GameVersion version2)
     {
         if (version1.Major == version2.Major) return version1.Minor >= version2.Minor;
-        else return version1.Major >= version2.Major;
+        return version1.Major >= version2.Major;
     }
     public static bool operator<=(GameVersion version1, GameVersion version2)
     {
         if (version1.Major == version2.Major) return version1.Minor <= version2.Minor;
-        else return version1.Major <= version2.Major;
+        return version1.Major <= version2.Major;
     }
 }
 
@@ -70,8 +73,8 @@ public record GameVersion
 // Use RSAPatch40.dll for 3.1-4.0
 // Use RSAPatch42.dll for 4.?-4.2
 // Copy RSA to Path -> Rename to version.dll -> Create PublicKey.txt
-// Rename version.dll to RSAPatch or Remove version.dll
-internal class Genshin
+// Remove version.dll
+public static class Genshin
 {
     private static readonly Dictionary<string, List<GameVersion>> patchVersions = new()
     {
@@ -80,12 +83,13 @@ internal class Genshin
         { "RSAPatch435x.zip", [GameVersion.FromString("4.3.50")] }
     };
 
-    public static void PatchGame(InstanceItem instance)
+    public static void Patch(string v)
     {
-        var version = GameVersion.FromString(instance.Version);
+        Patcher.Logger.Info("Starting patching...");
+        var version = GameVersion.FromString(v);
         foreach (var (filename, versions) in patchVersions)
         {
-            Console.WriteLine(filename);
+            Patcher.Logger.Debug(filename);
             if (versions.Count == 2)
             {
                 var min = versions[0];

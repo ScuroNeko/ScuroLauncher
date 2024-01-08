@@ -70,6 +70,6 @@ public class Theme
     {
         var jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
         File.WriteAllText(SettingsLocations.ThemesPath, jsonString);
-        Console.WriteLine(jsonString);
+        Providers.Logger.Debug(jsonString);
     }
 }

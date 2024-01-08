@@ -9,6 +9,16 @@
     <LangVersion>12</LangVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <StartupObject>ScuroLauncher.Program</StartupObject>
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,17 +40,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Lib\hpatchz.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="RSAPatch\RSAPatch40.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Titanium.Web.Proxy" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Titanium.Web.Proxy" Version="3.2.0" />
+    <ProjectReference Include="..\RSAPatch\RSAPatch.csproj" />
+    <ProjectReference Include="..\ScuroHttp\ScuroHttp.csproj" />
+    <ProjectReference Include="..\ScuroLib\ScuroLib.csproj" />
+    <ProjectReference Include="..\ScuroLogger\ScuroLogger.csproj" />
+    <ProjectReference Include="..\ScuroUpdater\ScuroUpdater.csproj" />
   </ItemGroup>
 
 </Project>

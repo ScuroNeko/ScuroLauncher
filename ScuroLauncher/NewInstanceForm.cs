@@ -1,6 +1,6 @@
 ﻿using ScuroLauncher.Settings;
-using System;
-using ScuroLauncher.Lib;
+using ScuroHttp;
+using ScuroLib;
 
 namespace ScuroLauncher;
 
@@ -13,9 +13,9 @@ public partial class NewInstanceForm : Form
     private InstanceType _instanceType;
     private string _instanceDownloadUrl;
 
-    private List<API.GameItem> _genshinList = [];
-    private List<API.GameItem> _starRailList = [];
-    private List<API.GameItem> _honkaiList = [];
+    private List<GameItem> _genshinList = [];
+    private List<GameItem> _starRailList = [];
+    private List<GameItem> _honkaiList = [];
 
     public NewInstanceForm(MainForm mainForm)
     {
@@ -78,7 +78,7 @@ public partial class NewInstanceForm : Form
         _instanceType = InstanceType.Genshin;
 
         if (_genshinList.Count == 0)
-            _genshinList = await API.MurasakiAPI.GetGenshinVersions();
+            _genshinList = await MurasakiApi.GetGenshinVersions();
         BuildVersionList();
     }
 
@@ -89,7 +89,7 @@ public partial class NewInstanceForm : Form
         Honkai.Enabled = true;
         _instanceType = InstanceType.StarRail;
         if (_starRailList.Count == 0)
-            _starRailList = await API.MurasakiAPI.GetStarRailVersions();
+            _starRailList = await MurasakiApi.GetStarRailVersions();
         BuildVersionList();
     }
 
@@ -100,7 +100,7 @@ public partial class NewInstanceForm : Form
         Honkai.Enabled = false;
         _instanceType = InstanceType.Honkai;
         if(_honkaiList.Count == 0)
-            _honkaiList = await API.MurasakiAPI.GetHonkaiImpactVersions();
+            _honkaiList = await MurasakiApi.GetHonkaiImpactVersions();
         BuildVersionList();
     }
     private void ReleasesCheckBox_CheckedChanged(object sender, EventArgs e)

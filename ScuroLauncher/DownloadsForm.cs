@@ -1,30 +1,35 @@
 ﻿using System.IO.Compression;
+using ScuroLogger;
+using ScuroHttp;
+using ScuroUpdater;
 
 namespace ScuroLauncher;
 
-public enum DownloadTaskType: byte
+public enum TaskType: byte
 {
     DOWNLOAD,
     UNZIP,
     HDIFF,
 }
 
-public record DownloadTask
-{
+public record WorkTask {
     public string Name { get; set; } = "";
-    public string? Url { get; set; }
     public Label TaskProgress { get; set; }
     public ProgressBar ProgressBar { get; set; }
     public Panel ProgressPanel { get; set; }
-    public DownloadTaskType TaskType { get; set; }
+    public TaskType TaskType { get; set; }
+    
+    public string Url { get; set; } = "";
+    public string OutDirectory { get; set; } = Path.Combine(Path.GetTempPath(), "ScuroLauncher");
+    public string InputFilePath { get; set; } = "";
 }
 
 public partial class DownloadsForm : Form
 {
     private int _taskY = 12;
     private const int TaskYStep = 72;
-    private readonly List<DownloadTask> _tasks = [];
-    private DownloadTask? _currentTask;
+    private readonly List<WorkTask> _tasks = [];
+    private WorkTask? _currentTask;
     private bool _isRunning = true;
 
     public DownloadsForm()
@@ -55,24 +60,55 @@ public partial class DownloadsForm : Form
             {
                 switch (_currentTask.TaskType)
                 {
-                    case DownloadTaskType.DOWNLOAD:
+                    case TaskType.DOWNLOAD:
                     {
-                        var fileSize = await API.API.GetFileSize(_currentTask.Url);
-                        await foreach (var progress in API.API.Download(_currentTask.Url))
+                        if (_currentTask.Url == null)
                         {
-                            if(IsHandleCreated) Invoke(UpdateProgress, [progress, fileSize]);
-                            Console.WriteLine($@"{Utils.SizeSuffix(progress)}/{Utils.SizeSuffix(fileSize)} {(float)progress / fileSize * 100L}");
+                            Providers.Logger.Error($"No url for task: {_currentTask}");
+                            RemoveTask(_currentTask);
+                            break;
+                        }
+                        var fileSize = await Api.GetFileSize(_currentTask.Url);
+                        await foreach (var progress in Api.Download(_currentTask.Url, _currentTask.OutDirectory))
+                        {
+                            if(IsHandleCreated)
+                                Invoke(UpdateProgress, [progress, fileSize]);
+                            Providers.Logger.Debug($"{Utils.SizeSuffix(progress)}/{Utils.SizeSuffix(fileSize)} {Math.Round((float)progress / fileSize * 100L, 2)}");
                         }
                         RemoveTask(_currentTask);
-                        _currentTask = null;
                         break;
                     }
-                    case DownloadTaskType.UNZIP:
+                    case TaskType.UNZIP:
+                    {
+                        await using var file = File.OpenRead(_currentTask.Name);
+                        using var zip = new ZipArchive(file, ZipArchiveMode.Read);
+                        var total = zip.Entries.Count;
+                        var done = 0;
+                        var buffer = new byte[8192];
+                        var outDirectory = Path.Combine(_currentTask.OutDirectory,
+                            Path.GetFileNameWithoutExtension(_currentTask.Name));
+                        foreach (var entry in zip.Entries)
+                        {
+                            var stream = entry.Open();
+                            var read = await stream.ReadAsync(buffer);
+                            
+                            var path = Path.Combine(outDirectory, entry.FullName);
+                            if (!Directory.Exists(path))
+                                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                            await using var outFile = File.OpenWrite(path);
+                            await outFile.WriteAsync(buffer.AsMemory(0, read));
+                            
+                            Providers.Logger.Info($"{entry.FullName} Progress: {done}/{total}");
+                            done++;
+                        }
+                        RemoveTask(_currentTask);
                         break;
-                    case DownloadTaskType.HDIFF:
+                    }
+                    case TaskType.HDIFF:
+                        Updater.CheckHdiff(Path.Combine(_currentTask.OutDirectory, _currentTask.Name));
                         break;
                     default:
-                        Console.WriteLine($@"Unknown task type! Report this to developer:\n{_currentTask}");
+                        Providers.Logger.Error($@"Unknown task type! Report this to developer:\n{_currentTask}");
                         break;
                 }
             }
@@ -81,39 +117,33 @@ public partial class DownloadsForm : Form
 
     public void AddDownloadTask(string url)
     {
-        var task = new DownloadTask { Name = Path.GetFileName(url), Url = url, TaskType = DownloadTaskType.DOWNLOAD };
+        var task = new WorkTask { Name = Path.GetFileName(url), Url = url, TaskType = TaskType.DOWNLOAD };
         _tasks.Add(task);
         DrawTask(task);
     }
 
     public void AddUnzipTask(string name)
     {
-        var task = new DownloadTask { Name = name, TaskType = DownloadTaskType.UNZIP };
+        var task = new WorkTask { Name = name, TaskType = TaskType.UNZIP };
         _tasks.Add(task);
         DrawTask(task);
-
-        using var file = File.OpenRead(name);
-        using var zip = new ZipArchive(file, ZipArchiveMode.Read);
-        
-        // TODO Count all entries and total unzipped for progress
-        zip.Entries.ToList().ForEach(entry =>
-        {
-            entry.Open();
-        });
     }
 
     public void AddHdiffTask(string name)
     {
-        var task = new DownloadTask { Name = name, TaskType = DownloadTaskType.HDIFF };
+        var task = new WorkTask { Name = name, TaskType = TaskType.HDIFF };
+        _tasks.Add(task);
+        DrawTask(task);
     }
 
-    public void RemoveTask(DownloadTask task)
+    public void RemoveTask(WorkTask task)
     {
         _tasks.Remove(task);
+        _currentTask = null;
         task.TaskProgress.Text = "Done";
     }
 
-    private void DrawTask(DownloadTask task)
+    private void DrawTask(WorkTask task)
     {
         var taskPanel = new Panel
         {
@@ -132,7 +162,7 @@ public partial class DownloadsForm : Form
         };
         var taskProgress = new Label
         {
-            Text = @"",
+            Text = "",
             Location = new Point(taskTitle.Width + 24, 12),
             ForeColor = Providers.SelectedTheme.TextColor,
         };
@@ -154,7 +184,7 @@ public partial class DownloadsForm : Form
         task.TaskProgress = taskProgress;
         task.ProgressPanel = taskPanel;
         
-        Console.WriteLine($@"New {task.TaskType} {task} was register");
+        Providers.Logger.Info($@"New {task.TaskType} {task} was register");
 
         _taskY += TaskYStep;
     }

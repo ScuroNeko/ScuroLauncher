@@ -33,6 +33,6 @@ public class Config
     {
         var jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
         File.WriteAllText(SettingsLocations.ConfigPath, jsonString);
-        Console.WriteLine(jsonString);
+        Providers.Logger.Debug(jsonString);
     }
 }

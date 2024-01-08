@@ -1,4 +1,4 @@
-﻿namespace ScuroLauncher.API;
+﻿namespace ScuroHttp;
 
 // Murasaki types
 public record GenshinResponse

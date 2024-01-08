@@ -1,4 +1,4 @@
-﻿namespace ScuroLauncher.Lib;
+﻿namespace ScuroLib;
 
 public class ReadSeekableStream : Stream
 {

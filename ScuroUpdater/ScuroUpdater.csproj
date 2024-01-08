@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPublishable>False</IsPublishable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="hpatchz.exe">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ScuroHttp\ScuroHttp.csproj" />
+      <ProjectReference Include="..\ScuroLib\ScuroLib.csproj" />
+      <ProjectReference Include="..\ScuroLogger\ScuroLogger.csproj" />
+    </ItemGroup>
+
+</Project>

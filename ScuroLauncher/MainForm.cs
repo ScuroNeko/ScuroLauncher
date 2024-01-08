@@ -1,26 +1,23 @@
 using ScuroLauncher.Settings;
-using ScuroLauncher.Updaters;
-using ScuroLauncher.RSAPatch;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Security.Policy;
+using ScuroLogger;
+using ScuroUpdater;
+
 
 namespace ScuroLauncher;
 
 public partial class MainForm : Form
 {
-    // private readonly DownloadsForm _downloadsForm;
     private InstanceItem? _selectedInstance;
 
-    private InstanceItem? runningInstance;
-    private Process? runningInstanceProcess;
+    private InstanceItem? _runningInstance;
+    private Process? _runningInstanceProcess;
 
     public MainForm()
     {
+        if (false) WinConsole.CreateConsole();
         InitializeComponent();
         Providers.Load();
-
-        if (Providers.Config.Debug) AllocConsole();
 
         Providers.DownloadsForm = new DownloadsForm();
         LoadTheme(Providers.SelectedTheme);
@@ -37,16 +34,16 @@ public partial class MainForm : Form
         Providers.ProxyService.Stop();
 
         // Clear running instance
-        runningInstance = null;
-        runningInstanceProcess = null;
+        _runningInstance = null;
+        _runningInstanceProcess = null;
     }
 
     private void Kill_Click(object? sender, EventArgs e)
     {
-        if (runningInstanceProcess == null) throw new NullReferenceException();
-        runningInstanceProcess.Kill();
-        runningInstanceProcess = null;
-        runningInstance = null;
+        if (_runningInstanceProcess == null) throw new NullReferenceException();
+        _runningInstanceProcess.Kill();
+        _runningInstanceProcess = null;
+        _runningInstance = null;
         Providers.ProxyService.Stop();
         DrawInstanceInfo(_selectedInstance != null);
     }
@@ -84,9 +81,9 @@ public partial class MainForm : Form
             UseShellExecute = true
         };
 
-        runningInstance = _selectedInstance;
-        runningInstanceProcess = Process.Start(startInfo);
-        if (runningInstanceProcess != null) runningInstanceProcess.Exited += GameProcess_Exited;
+        _runningInstance = _selectedInstance;
+        _runningInstanceProcess = Process.Start(startInfo);
+        if (_runningInstanceProcess != null) _runningInstanceProcess.Exited += GameProcess_Exited;
         DrawInstanceInfo(true);
     }
 
@@ -100,30 +97,37 @@ public partial class MainForm : Form
     private async void CheckUpdates_Click(object? sender, EventArgs e)
     {
         // TODO
-        // _downloadsForm.AddDownloadTask("https://autopatchhk.yuanshen.com/client_app/pc_diff/10/1.0.0_1.0.1_diff_cSQJ5eOD.zip");
-        Genshin.PatchGame(_selectedInstance);
+        Providers.DownloadsForm.AddDownloadTask("https://autopatchhk.yuanshen.com/client_app/pc_diff/10/1.0.0_1.0.1_diff_cSQJ5eOD.zip");
+        // Providers.DownloadsForm.AddUnzipTask("1.0.0_1.0.1_diff_cSQJ5eOD.zip");
+        // Genshin.PatchGame(_selectedInstance.Version);
         if (_selectedInstance == null) throw new NullReferenceException();
         UpdateInfo updateInfo;
-        if (_selectedInstance.Type == InstanceType.StarRail)
-            updateInfo = await StarRailUpdater.Check(_selectedInstance.Path);
-        else if (_selectedInstance.Type == InstanceType.Genshin)
-            updateInfo = await GenshinUpdater.Check(_selectedInstance.Path);
-        else
+        switch (_selectedInstance.Type)
         {
-            MessageBox.Show("This game currently cannot be updated :(", "Error!");
-            return;
+            case InstanceType.StarRail:
+                updateInfo = await StarRailUpdater.Check(_selectedInstance.Path);
+                break;
+            case InstanceType.Genshin:
+                updateInfo = await GenshinUpdater.Check(_selectedInstance.Path);
+                break;
+            case InstanceType.Honkai:
+            case InstanceType.Zzz:
+            case InstanceType.Unknown:
+            default:
+                MessageBox.Show(@"This game currently cannot be updated :(", @"Error!");
+                return;
         }
 
         if (!updateInfo.HasUpdate)
         {
-            MessageBox.Show("No new updates", "No new updates");
+            MessageBox.Show(@"No new updates", @"No new updates");
         }
         else
         {
-            var result = MessageBox.Show("New version " + updateInfo.NewVersion + " is available!\nUpdate now?", "Update available", MessageBoxButtons.YesNo);
+            var result = MessageBox.Show(@$"New version {updateInfo.NewVersion} is available!\nUpdate now?", @"Update available", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                await GenshinUpdater.DoUpdate();
+                GenshinUpdater.DoUpdate();
             }
         }
     }
@@ -131,7 +135,7 @@ public partial class MainForm : Form
     private void DeleteInstance_Click(object? sender, EventArgs e)
     {
         if (_selectedInstance == null) throw new NullReferenceException();
-        var result = MessageBox.Show("Are you sure to delete this instance?", "Are you sure?", MessageBoxButtons.YesNo);
+        var result = MessageBox.Show(@"Are you sure to delete this instance?", @"Are you sure?", MessageBoxButtons.YesNo);
         if (result != DialogResult.Yes) return;
         Providers.Instances.Instances.Remove(_selectedInstance);
         Providers.Instances.Save();
@@ -192,13 +196,13 @@ public partial class MainForm : Form
         Kill.Visible = visible;
 
         // If any instance running, disable launch button
-        if (runningInstanceProcess != null && _selectedInstance != runningInstance)
+        if (_runningInstanceProcess != null && _selectedInstance != _runningInstance)
         {
             LaunchInstance.Enabled = false;
             LaunchInstance.Visible = visible;
             Kill.Visible = false;
         }
-        else if (runningInstanceProcess != null && _selectedInstance == runningInstance)
+        else if (_runningInstanceProcess != null && _selectedInstance == _runningInstance)
         {
             LaunchInstance.Visible = false;
             Kill.Visible = visible;
@@ -293,10 +297,6 @@ public partial class MainForm : Form
         NewInstance.ForeColor = selectedTheme.TextColor;
         NewInstance.Font = new Font(selectedTheme.Font, NewInstance.Font.Size, NewInstance.Font.Style);
     }
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    static extern bool AllocConsole();
 
     private void DownloadsManagerToolStripMenuItem_Click(object? sender, EventArgs e)
     {

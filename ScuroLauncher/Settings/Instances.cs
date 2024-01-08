@@ -79,6 +79,6 @@ public class Instance
     {
         var jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
         File.WriteAllText(SettingsLocations.InstancesPath, jsonString);
-        Console.WriteLine(jsonString);
+        Providers.Logger.Debug(jsonString);
     }
 }
